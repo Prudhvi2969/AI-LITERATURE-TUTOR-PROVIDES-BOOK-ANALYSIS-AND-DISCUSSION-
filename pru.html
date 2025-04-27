@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Literature Tutor</title>
+  <script async type='module' src='https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js'></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <style>
+    :root {
+      --primary: #8B5CF6;
+      --primary-dark: #7C3AED;
+    }
+    
+    .dark {
+      --bg-primary: #121212;
+      --bg-secondary: #1E1E1E;
+      --text-primary: #F3F4F6;
+      --text-secondary: #D1D5DB;
+      --card-bg: #1E1E1E;
+      --border: #333333;
+    }
+    
+    .light {
+      --bg-primary: #F9FAFB;
+      --bg-secondary: #FFFFFF;
+      --text-primary: #111827;
+      --text-secondary: #4B5563;
+      --card-bg: #FFFFFF;
+      --border: #E5E7EB;
+    }
+    
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+      font-family: 'Georgia', serif;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      transition: background-color 0.3s, border 0.3s;
+    }
+    
+    .header-bg {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .hero-bg {
+      background-color: var(--bg-secondary);
+    }
+    
+    .footer-bg {
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+    
+    .book-ticker {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      padding: 10px 0;
+    }
+    
+    .ticker-content {
+      display: inline-block;
+      animation: ticker 40s linear infinite;
+      padding-right: 100%;
+    }
+    
+    @keyframes ticker {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+    
+    .book-item {
+      display: inline-block;
+      padding: 0 20px;
+    }
+    
+    .chart-container {
+      width: 100%;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header Section -->
+  <header class="header-bg sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-purple-500">📚 AI Literature Tutor</h1>
+      <div class="flex items-center space-x-6">
+        <nav class="hidden md:flex space-x-6">
+          <a href="#" class="hover:text-purple-500 transition-colors">Home</a>
+          <a href="#features" class="hover:text-purple-500 transition-colors">Features</a>
+          <a href="#book-insights" class="hover:text-purple-500 transition-colors">Book Insights</a>
+          <a href="#contact" class="hover:text-purple-500 transition-colors">Contact</a>
+        </nav>
+        <button id="theme-toggle" class="p-2 rounded-full bg-gray-700 dark:bg-gray-200">
+          <svg id="moon-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+          </svg>
+          <svg id="sun-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Book Ticker -->
+  <div class="book-ticker bg-purple-600 text-white">
+    <div class="ticker-content">
+      <span class="book-item">To Kill a Mockingbird - Harper Lee: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">1984 - George Orwell: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">Pride and Prejudice - Jane Austen: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">The Great Gatsby - F. Scott Fitzgerald: <span class="text-yellow-300">★★★★☆</span></span>
+      <span class="book-item">Hamlet - William Shakespeare: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">The Odyssey - Homer: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">Beloved - Toni Morrison: <span class="text-yellow-300">★★★★★</span></span>
+      <span class="book-item">Crime and Punishment - Fyodor Dostoevsky: <span class="text-yellow-300">★★★★★</span></span>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-bg py-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+      <div class="md:w-1/2 mb-8 md:mb-0">
+        <h2 class="text-4xl font-extrabold mb-4 text-purple-500">
+          AI-Powered Literary Analysis & Discussion
+        </h2>
+        <p class="text-lg mb-6">
+          Ask about any classic or contemporary work — like <span class="font-semibold text-purple-400">To Kill a Mockingbird</span>, <span class="font-semibold text-purple-400">1984</span>, or <span class="font-semibold text-purple-400">The Great Gatsby</span> — and our AI will provide in-depth analysis, character studies, and engage in meaningful literary discussions.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a href="#chatbot" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center">Try AI Tutor</a>
+          <a href="#book-insights" class="bg-gray-700 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-colors text-center">Book Insights</a>
+        </div>
+      </div>
+      <img src="imag1.webp" alt="Literature Discussion Illustration" class="md:w-1/2 rounded-lg shadow-lg" />
+    </div>
+  </section>
+
+  <!-- Literature Insights Section -->
+  <section id="book-insights" class="py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <h3 class="text-3xl font-bold mb-8 text-center">Top Literary Insights</h3>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Trending Authors Chart -->
+        <div class="card rounded-xl p-6 shadow-lg">
+          <h4 class="text-xl font-semibold mb-4">Most Discussed Authors</h4>
+          <div class="chart-container">
+            <canvas id="authorsChart"></canvas>
+          </div>
+          <p class="text-sm">Contemporary discussions continue to focus on classics while embracing new diverse voices in literature.</p>
+        </div>
+        
+        <!-- Top Book Recommendations -->
+        <div class="card rounded-xl p-6 shadow-lg">
+          <h4 class="text-xl font-semibold mb-4">Monthly Book Recommendations</h4>
+          
+          <div class="mb-6">
+            <h5 class="font-medium mb-2 text-purple-500">Fiction</h5>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span>The Midnight Library</span>
+                <span class="text-yellow-500">★★★★★</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Cloud Cuckoo Land</span>
+                <span class="text-yellow-500">★★★★☆</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Demon Copperhead</span>
+                <span class="text-yellow-500">★★★★★</span>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h5 class="font-medium mb-2 text-blue-500">Non-Fiction</h5>
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span>Atomic Habits</span>
+                <span class="text-yellow-500">★★★★☆</span>
+              </div>
+              <div class="flex justify-between">
+                <span>The Dawn of Everything</span>
+                <span class="text-yellow-500">★★★★★</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Braiding Sweetgrass</span>
+                <span class="text-yellow-500">★★★★★</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-12 bg-gradient-to-b from-purple-900 to-black text-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <h3 class="text-3xl font-bold mb-12 text-center">What Our AI Literature Tutor Can Do</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">📖</div>
+          <h4 class="text-xl font-semibold mb-2">Comprehensive Analysis</h4>
+          <p>Detailed literary analysis covering themes, motifs, symbolism, and historical context of any book.</p>
+        </div>
+        
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">👥</div>
+          <h4 class="text-xl font-semibold mb-2">Character Studies</h4>
+          <p>In-depth exploration of character development, motivations, and relationships within literary works.</p>
+        </div>
+        
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">💬</div>
+          <h4 class="text-xl font-semibold mb-2">Literary Discussions</h4>
+          <p>Engage in thought-provoking conversations about literary techniques, interpretations, and significance.</p>
+        </div>
+        
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">🔍</div>
+          <h4 class="text-xl font-semibold mb-2">Citation Help</h4>
+          <p>Assistance with proper citations, references, and bibliographic information for academic papers.</p>
+        </div>
+        
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">📚</div>
+          <h4 class="text-xl font-semibold mb-2">Book Recommendations</h4>
+          <p>Personalized book suggestions based on your reading preferences, interests, and literary tastes.</p>
+        </div>
+        
+        <div class="p-6 rounded-xl bg-opacity-20 bg-purple-800 backdrop-filter backdrop-blur-sm">
+          <div class="text-3xl mb-4">✍️</div>
+          <h4 class="text-xl font-semibold mb-2">Essay Guidance</h4>
+          <p>Help with structuring literary essays, developing compelling arguments, and improving your critical writing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Literature Education -->
+  <section class="py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <h3 class="text-3xl font-bold mb-8 text-center">Literary Education</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="card rounded-xl p-6 shadow-lg">
+          <h4 class="text-xl font-semibold mb-4">Understanding Literary Devices</h4>
+          <img src="/api/placeholder/400/250" alt="Literary Devices" class="w-full rounded-lg mb-4" />
+          <p>Literary devices enhance meaning and reading experience. Key devices include:</p>
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>Metaphor & Simile</li>
+            <li>Symbolism & Imagery</li>
+            <li>Foreshadowing & Irony</li>
+            <li>Allusion & Allegory</li>
+          </ul>
+        </div>
+        
+        <div class="card rounded-xl p-6 shadow-lg">
+          <h4 class="text-xl font-semibold mb-4">Literary Movements</h4>
+          <img src="/api/placeholder/400/250" alt="Literary Movements" class="w-full rounded-lg mb-4" />
+          <p>Different literary movements reflect cultural and historical influences:</p>
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>Romanticism: Emphasis on emotion and individualism</li>
+            <li>Modernism: Breaking with traditional forms and styles</li>
+            <li>Postmodernism: Self-reference, irony, and fragmentation</li>
+            <li>Magical Realism: Realistic settings with magical elements</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chatbot Section -->
+  <section id="chatbot" class="py-12 bg-gradient-to-b from-black to-purple-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h3 class="text-3xl font-bold mb-4">💬 Talk to Your AI Literature Tutor</h3>
+      <p class="mb-6">Ask about any book and get insightful analysis!</p>
+      <div class="mx-auto flex justify-center">
+        <zapier-interfaces-chatbot-embed is-popup='false' chatbot-id='cm9v9llxr002gr8y6id85pfqd' height='500px' width='800px'></zapier-interfaces-chatbot-embed>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-12">
+    <div class="max-w-7xl mx-auto px-4">
+      <h3 class="text-3xl font-bold mb-8 text-center">What Readers Say</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card rounded-xl p-6 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-gray-300 mr-4"></div>
+            <div>
+              <h5 class="font-semibold">Emma R.</h5>
+              <div class="flex text-yellow-400">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+            </div>
+          </div>
+          <p>"This AI tutor helped me understand the complex themes in Dostoevsky's works. The insights were genuinely illuminating."</p>
+        </div>
+        
+        <div class="card rounded-xl p-6 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-gray-300 mr-4"></div>
+            <div>
+              <h5 class="font-semibold">David T.</h5>
+              <div class="flex text-yellow-400">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+            </div>
+          </div>
+          <p>"As an English teacher, this tool has been invaluable for crafting lesson plans and helping students engage with challenging texts."</p>
+        </div>
+        
+        <div class="card rounded-xl p-6 shadow-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-gray-300 mr-4"></div>
+            <div>
+              <h5 class="font-semibold">Sophia L.</h5>
+              <div class="flex text-yellow-400">
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+              </div>
+            </div>
+          </div>
+          <p>"The book recommendations are spot-on! I've discovered so many new authors that align perfectly with my reading preferences."</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-12 bg-purple-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h3 class="text-3xl font-bold mb-4">Join Our Literary Community</h3>
+      <p class="mb-6">Subscribe to our newsletter for book recommendations and literary insights</p>
+      
+      <form class="max-w-md mx-auto">
+        <div class="flex flex-col sm:flex-row gap-2">
+          <input type="email" placeholder="Your email address" class="flex-grow py-3 px-4 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">Subscribe</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-bg py-8">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <h4 class="text-xl font-bold text-purple-500 mb-4">AI Literature Tutor</h4>
+          <p class="text-sm">Advanced AI technology providing in-depth literary analysis and personalized book discussions for students, teachers, and book lovers.</p>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Quick Links</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Home</a></li>
+            <li><a href="#features" class="hover:text-purple-500 transition-colors">Features</a></li>
+            <li><a href="#book-insights" class="hover:text-purple-500 transition-colors">Book Insights</a></li>
+            <li><a href="#chatbot" class="hover:text-purple-500 transition-colors">AI Tutor</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Resources</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Reading Lists</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Literary Terms</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Writing Guides</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">FAQs</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h5 class="font-semibold mb-4">Connect</h5>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Contact Us</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Support</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Terms of Service</a></li>
+            <li><a href="#" class="hover:text-purple-500 transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="pt-8 border-t border-gray-700 text-center text-sm">
+        <p>©️ 2025 AI Literature Tutor</p>
+        <p class="mt-2 text-xs">Our AI provides literary insights to enhance your understanding and appreciation of books, but should not replace critical thinking or original analysis in academic work.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark/Light Mode Toggle
+    const htmlElement = document.documentElement;
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    
+    // Check for saved theme preference or use default
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    htmlElement.className = savedTheme;
+    
+    // Update icons based on current theme
+    updateThemeIcons(savedTheme);
+    
+    // Theme toggle functionality
+    themeToggle.addEventListener('click', () => {
+      if (htmlElement.classList.contains('dark')) {
+        htmlElement.classList.remove('dark');
+        htmlElement.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        updateThemeIcons('light');
+      } else {
+        htmlElement.classList.remove('light');
+        htmlElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        updateThemeIcons('dark');
+      }
+    });
+    
+    function updateThemeIcons(theme) {
+      if (theme === 'dark') {
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+      } else {
+        moonIcon.classList.remove('hidden');
+        sunIcon.classList.add('hidden');
+      }
+    }
+    
+    // Authors Chart
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('authorsChart').getContext('2d');
+      
+      // Sample data for most discussed authors
+      const authorsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Shakespeare', 'Austen', 'Dickens', 'Morrison', 'Orwell', 'García Márquez', 'Woolf', 'Dostoevsky'],
+          datasets: [{
+            label: 'Discussion Frequency',
+            data: [85, 78, 65, 58, 72, 53, 60, 68],
+            backgroundColor: 'rgba(139, 92, 246, 0.6)',
+            borderColor: 'rgba(139, 92, 246, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: htmlElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: htmlElement.classList.contains('dark') ? '#D1D5DB' : '#4B5563'
+              }
+            },
+            y: {
+              grid: {
+                color: htmlElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: htmlElement.classList.contains('dark') ? '#D1D5DB' : '#4B5563'
+              }
+            }
+          }
+        }
+      });
+      
+      // Update chart colors when theme changes
+      themeToggle.addEventListener('click', () => {
+        const isDark = htmlElement.classList.contains('dark');
+        
+        authorsChart.options.scales.x.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        authorsChart.options.scales.x.ticks.color = isDark ? '#D1D5DB' : '#4B5563';
+        authorsChart.options.scales.y.grid.color = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        authorsChart.options.scales.y.ticks.color = isDark ? '#D1D5DB' : '#4B5563';
+        
+        authorsChart.update();
+      });
+    });
+  </script>
+</body>
+</html>
